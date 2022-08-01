@@ -14,10 +14,9 @@ import com.example.mydemo.R;
 
 public class RedListExpertFloatButton extends ViewGroup {
     private OverScroller scroller;
-    private int width = 0;
-    private int height = 0;
-    private boolean open;
-    private int initDx, initDy;
+    private int offset = 0;
+    private int showWidth = 70;
+
 
     public RedListExpertFloatButton(Context context) {
         this(context, null);
@@ -40,6 +39,8 @@ public class RedListExpertFloatButton extends ViewGroup {
         ivBg.setImageResource(R.drawable.redlist_expert_float_button_bg);
         ivBg.setTag("ivBg");
         ivBg.setOnClickListener(new OnClickListener() {
+            private boolean open;
+
             @Override
             public void onClick(View view) {
                 if (open) {
@@ -57,8 +58,7 @@ public class RedListExpertFloatButton extends ViewGroup {
 
                     if (!scroller.isFinished())
                         scroller.abortAnimation();
-                    scroller.startScroll(scroller.getFinalX(), scroller.getFinalY(), -(width / 2), 0, 1000);
-                    invalidate();
+                    scroller.startScroll(scroller.getFinalX(), scroller.getFinalY(), -offset, 0, 1000);
                 } else {
                     open = true;
 //                    ValueAnimator animator = ValueAnimator.ofInt(initDx, initDx + (width / 2));
@@ -74,9 +74,9 @@ public class RedListExpertFloatButton extends ViewGroup {
 
                     if (!scroller.isFinished())
                         scroller.abortAnimation();
-                    scroller.startScroll(initDx, initDy, width / 2, 0, 1000);
-                    invalidate();
+                    scroller.startScroll(0, 0, offset, 0, 1000);
                 }
+                invalidate();
             }
         });
 
@@ -109,6 +109,9 @@ public class RedListExpertFloatButton extends ViewGroup {
 
         measureChildren(widthMeasureSpec, heightMeasureSpec);
 
+        int width = 0;
+        int height = 0;
+
         int cCount = getChildCount();
         int cWidth = 0;
         int cHeight = 0;
@@ -126,18 +129,9 @@ public class RedListExpertFloatButton extends ViewGroup {
             height = Math.max(height, cHeight);
         }
 
+        offset = width - showWidth;
         setMeasuredDimension((wModel == MeasureSpec.EXACTLY) ? wSize : width,
                 (hModel == MeasureSpec.EXACTLY) ? hSize : height);
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        initDx = -w + 80;
-        initDy = -h + height;
-        if (!scroller.isFinished())
-            scroller.abortAnimation();
-        scroller.startScroll(scroller.getFinalX(), scroller.getFinalY(), initDx, initDy, 0);
     }
 
 
@@ -156,8 +150,11 @@ public class RedListExpertFloatButton extends ViewGroup {
             cHeight = childView.getMeasuredHeight();
             cParams = (MarginLayoutParams) childView.getLayoutParams();
 
+            cl = getWidth() - cWidth - cParams.leftMargin - cParams.rightMargin + offset;
+            ct = getHeight() - cHeight - cParams.topMargin - cParams.bottomMargin;
             cr = cl + cWidth;
             cb = ct + cHeight;
+
             childView.layout(cl, ct, cr, cb);
         }
     }
