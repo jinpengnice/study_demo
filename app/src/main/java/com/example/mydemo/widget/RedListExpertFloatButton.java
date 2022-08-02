@@ -13,7 +13,7 @@ public class RedListExpertFloatButton extends ViewGroup {
     private OverScroller scroller;
     private int offset = 0;         // 计算的需要偏移量
     private int showWidth = 70;     // 初始显示的大小
-    private int duration = 1000;    // 动画需要的时间
+    private int duration = 500;    // 动画需要的时间
     private boolean isOpen = false;
 
     public RedListExpertFloatButton(Context context) {
