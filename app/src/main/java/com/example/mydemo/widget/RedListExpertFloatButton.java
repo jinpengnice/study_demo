@@ -1,22 +1,20 @@
 package com.example.mydemo.widget;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.util.AttributeSet;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.OverScroller;
-import android.widget.TextView;
 
-import com.example.mydemo.R;
-
+/**
+ * 悬浮吸附按钮，支持自定义内容
+ */
 public class RedListExpertFloatButton extends ViewGroup {
     private OverScroller scroller;
-    private int offset = 0;
-    private int showWidth = 70;
-
+    private int offset = 0;         // 计算的需要偏移量
+    private int showWidth = 70;     // 初始显示的大小
+    private int duration = 1000;    // 动画需要的时间
+    private boolean isOpen = false;
 
     public RedListExpertFloatButton(Context context) {
         this(context, null);
@@ -33,66 +31,6 @@ public class RedListExpertFloatButton extends ViewGroup {
 
     private void init() {
         this.scroller = new OverScroller(getContext());
-
-        ImageView ivBg = new ImageView(getContext());
-        ivBg.setAdjustViewBounds(true);
-        ivBg.setImageResource(R.drawable.redlist_expert_float_button_bg);
-        ivBg.setTag("ivBg");
-        ivBg.setOnClickListener(new OnClickListener() {
-            private boolean open;
-
-            @Override
-            public void onClick(View view) {
-                if (open) {
-                    open = false;
-//                    ValueAnimator animator = ValueAnimator.ofInt(initDx + (width / 2), initDx);
-//                    animator.setInterpolator(new LinearInterpolator());
-//                    animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//                        @Override
-//                        public void onAnimationUpdate(ValueAnimator valueAnimator) {
-//                            scrollTo((Integer) valueAnimator.getAnimatedValue(), scroller.getCurrY());
-//                        }
-//                    });
-//                    animator.start();
-
-
-                    if (!scroller.isFinished())
-                        scroller.abortAnimation();
-                    scroller.startScroll(scroller.getFinalX(), scroller.getFinalY(), -offset, 0, 1000);
-                } else {
-                    open = true;
-//                    ValueAnimator animator = ValueAnimator.ofInt(initDx, initDx + (width / 2));
-//                    animator.setInterpolator(new LinearInterpolator());
-//                    animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//                        @Override
-//                        public void onAnimationUpdate(ValueAnimator valueAnimator) {
-//                            scrollTo((Integer) valueAnimator.getAnimatedValue(), scroller.getCurrY());
-//                        }
-//                    });
-//                    animator.start();
-
-
-                    if (!scroller.isFinished())
-                        scroller.abortAnimation();
-                    scroller.startScroll(0, 0, offset, 0, 1000);
-                }
-                invalidate();
-            }
-        });
-
-        TextView tvContent = new TextView(getContext());
-        tvContent.setText("发布方案");
-        tvContent.setTextColor(Color.WHITE);
-        tvContent.setTextSize(TypedValue.COMPLEX_UNIT_PX, 36);
-        tvContent.setTag("tvContent");
-
-        ImageView ivClose = new ImageView(getContext());
-        ivClose.setImageResource(R.drawable.icon_float_close);
-        ivClose.setTag("ivClose");
-
-        addView(ivBg, new MarginLayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-//        addView(tvContent, new MarginLayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-//        addView(ivClose, new MarginLayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
     }
 
     @Override
@@ -134,7 +72,6 @@ public class RedListExpertFloatButton extends ViewGroup {
                 (hModel == MeasureSpec.EXACTLY) ? hSize : height);
     }
 
-
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         int cCount = getChildCount();
@@ -155,10 +92,10 @@ public class RedListExpertFloatButton extends ViewGroup {
             cr = cl + cWidth;
             cb = ct + cHeight;
 
+            // 所有子 view 以右下排列摆放, 可根据需要扩展
             childView.layout(cl, ct, cr, cb);
         }
     }
-
 
     @Override
     public void computeScroll() {
@@ -167,5 +104,63 @@ public class RedListExpertFloatButton extends ViewGroup {
             scrollTo(scroller.getCurrX(), scroller.getCurrY());
             invalidate();
         }
+    }
+
+    /**
+     * 打开
+     */
+    public void open() {
+        if (scroller.isFinished()) {
+            isOpen = true;
+            scroller.startScroll(0, 0, offset, 0, duration);
+            invalidate();
+        }
+    }
+
+    /**
+     * 关闭
+     */
+    public void close() {
+        if (scroller.isFinished()) {
+            isOpen = false;
+            scroller.startScroll(scroller.getFinalX(), scroller.getFinalY(), -offset, 0, duration);
+            invalidate();
+        }
+    }
+
+    /**
+     * 是否打开中
+     *
+     * @return ture: 展开中， false: 隐藏中
+     */
+    public boolean isOpening() {
+        return isOpen;
+    }
+
+    /**
+     * 是否运行中
+     *
+     * @return bool
+     */
+    public boolean isRunning() {
+        return !scroller.isFinished();
+    }
+
+    /**
+     * 设置位移动画需要的时间
+     *
+     * @param duration duration
+     */
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    /**
+     * 设置初始显示的大小
+     *
+     * @param px px
+     */
+    public void setShowWidth(int px) {
+        this.showWidth = px;
     }
 }

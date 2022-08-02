@@ -2,10 +2,9 @@ package com.example.mydemo
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.MotionEvent
-import android.widget.Button
-import android.widget.LinearLayout
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.example.mydemo.widget.RedListExpertFloatButton
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,6 +24,19 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, ScrollerActivity::class.java))
         }
 
+
+        val floatButton = findViewById<RedListExpertFloatButton>(R.id.float_btn)
+
+        findViewById<ImageView>(R.id.iv_close).setOnClickListener {
+            floatButton.close()
+        }
+        findViewById<FrameLayout>(R.id.fl_parent).setOnClickListener {
+            if (floatButton.isOpening) {
+                Toast.makeText(this, "去发布内容！", Toast.LENGTH_SHORT).show()
+            } else {
+                floatButton.open()
+            }
+        }
     }
 
 //    var mLastX = 0
